@@ -1,10 +1,7 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-
 import '../../../../common/structs/horizontal_spacing.dart';
 import '../../../../document/attribute.dart';
 import '../../../../document/nodes/block.dart';
-import '../../../../document/nodes/node.dart';
 import '../../default_styles.dart';
 
 typedef LeadingBlockIndentWidth = HorizontalSpacing Function(
@@ -16,31 +13,9 @@ typedef LeadingBlockIndentWidth = HorizontalSpacing Function(
 typedef LeadingBlockNumberPointWidth = double Function(
     double fontSize, int count);
 
-typedef TextSpanBuilder = InlineSpan Function(
-  BuildContext context,
-  Node node,
-  int nodeOffset,
-  String text,
-  TextStyle? style,
-  GestureRecognizer? recognizer,
-);
+class TextBlockUtils {
+  TextBlockUtils._();
 
-TextSpan defaultSpanBuilder(
-  BuildContext context,
-  Node node,
-  int textOffset,
-  String text,
-  TextStyle? style,
-  GestureRecognizer? recognizer,
-) =>
-    TextSpan(
-      text: text,
-      style: style,
-      recognizer: recognizer,
-      mouseCursor: (recognizer != null) ? SystemMouseCursors.click : null,
-    );
-
-abstract final class TextBlockUtils {
   /// Get the horizontalSpacing using the default
   /// implementation provided by [Flutter Quill]
   static HorizontalSpacing defaultIndentWidthBuilder(

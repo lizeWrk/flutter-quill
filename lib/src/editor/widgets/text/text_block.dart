@@ -9,9 +9,10 @@ import '../../../delta/delta_diff.dart';
 import '../../../document/attribute.dart';
 import '../../../document/nodes/block.dart';
 import '../../../document/nodes/line.dart';
-import '../../../editor_toolbar_shared/color.dart';
+import '../../../toolbar/base_toolbar.dart';
 import '../../editor.dart';
 import '../../embed/embed_editor_builder.dart';
+import '../../provider.dart';
 import '../../raw_editor/builders/leading_block_builder.dart';
 import '../box.dart';
 import '../cursor.dart';
@@ -70,7 +71,6 @@ class EditableTextBlock extends StatelessWidget {
     required this.hasFocus,
     required this.contentPadding,
     required this.embedBuilder,
-    required this.textSpanBuilder,
     required this.linkActionPicker,
     required this.cursorCont,
     required this.indentLevelCounts,
@@ -101,7 +101,6 @@ class EditableTextBlock extends StatelessWidget {
   final bool hasFocus;
   final EdgeInsets? contentPadding;
   final EmbedsBuilder embedBuilder;
-  final TextSpanBuilder textSpanBuilder;
   final LinkActionPicker linkActionPicker;
   final ValueChanged<String>? onLaunchUrl;
   final CustomRecognizerBuilder? customRecognizerBuilder;
@@ -188,7 +187,6 @@ class EditableTextBlock extends StatelessWidget {
           line: line,
           textDirection: textDirection,
           embedBuilder: embedBuilder,
-          textSpanBuilder: textSpanBuilder,
           customStyleBuilder: customStyleBuilder,
           styles: styles!,
           readOnly: readOnly,
@@ -209,7 +207,7 @@ class EditableTextBlock extends StatelessWidget {
         MediaQuery.devicePixelRatioOf(context),
         cursorCont,
         styles!.inlineCode!,
-        null);
+      );
       final nodeTextDirection = getDirectionOfNode(line, textDirection);
       children.add(
         Directionality(
@@ -268,7 +266,7 @@ class EditableTextBlock extends StatelessWidget {
         attribute == Attribute.checked || attribute == Attribute.unchecked;
     final isCodeBlock = attrs.containsKey(Attribute.codeBlock.key);
     if (attribute == null) return null;
-    final leadingConfig = LeadingConfig(
+    final leadingConfigurations = LeadingConfigurations(
       attribute: attribute,
       attrs: attrs,
       indentLevelCounts: indentLevelCounts,
@@ -279,21 +277,29 @@ class EditableTextBlock extends StatelessWidget {
         if (isOrdered) {
           return defaultStyles.leading!.style.copyWith(
             fontSize: size,
-            color: fontColor,
+            color: context.quillEditorElementOptions?.orderedList
+                        .useTextColorForDot ==
+                    true
+                ? fontColor
+                : null,
           );
         }
         if (isUnordered) {
           return defaultStyles.leading!.style.copyWith(
             fontWeight: FontWeight.bold,
             fontSize: size,
-            color: fontColor,
+            color: context.quillEditorElementOptions?.unorderedList
+                        .useTextColorForDot ==
+                    true
+                ? fontColor
+                : null,
           );
         }
         if (isCheck) {
           return null;
         }
         return defaultStyles.code!.style.copyWith(
-          color: defaultStyles.code!.style.color!.withValues(alpha: 0.4),
+          color: defaultStyles.code!.style.color!.withOpacity(0.4),
         );
       }(),
       width: () {
@@ -324,7 +330,7 @@ class EditableTextBlock extends StatelessWidget {
     if (customLeadingBlockBuilder != null) {
       final leadingBlockNodeBuilder = customLeadingBlockBuilder?.call(
         line,
-        leadingConfig,
+        leadingConfigurations,
       );
       if (leadingBlockNodeBuilder != null) {
         return leadingBlockNodeBuilder;
@@ -332,18 +338,19 @@ class EditableTextBlock extends StatelessWidget {
     }
 
     if (isOrdered) {
-      return numberPointLeading(leadingConfig);
+      return numberPointLeading(leadingConfigurations);
     }
 
     if (isUnordered) {
-      return bulletPointLeading(leadingConfig);
+      return bulletPointLeading(leadingConfigurations);
     }
 
     if (isCheck) {
-      return checkboxLeading(leadingConfig);
+      return checkboxLeading(leadingConfigurations);
     }
-    if (isCodeBlock) {
-      return codeBlockLineNumberLeading(leadingConfig);
+    if (isCodeBlock &&
+        context.requireQuillEditorElementOptions.codeBlock.enableLineNumbers) {
+      return codeBlockLineNumberLeading(leadingConfigurations);
     }
     return null;
   }
