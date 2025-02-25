@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart' show immutable;
-import 'package:flutter/widgets.dart'
-    show Axis, WrapAlignment, WrapCrossAlignment;
+import 'package:flutter/widgets.dart' show Axis, WrapAlignment, WrapCrossAlignment;
 
 import '../../controller/quill_controller.dart';
 import '../buttons/hearder_style/select_header_style_buttons.dart';
@@ -88,7 +87,9 @@ class QuillSimpleToolbarConfigurations extends QuillSharedToolbarProperties {
     super.toolbarIconAlignment = WrapAlignment.center,
     super.toolbarIconCrossAlignment = WrapCrossAlignment.center,
     super.buttonOptions = const QuillSimpleToolbarButtonOptions(),
-    this.customButtons = const [],
+    this.isScrollable = true,
+    this.customButtonsFront = const [],
+    this.customButtonsBack = const [],
     this.fontFamilyValues,
     super.multiRowsDisplay = true,
     this.fontSizesValues,
@@ -183,7 +184,10 @@ class QuillSimpleToolbarConfigurations extends QuillSharedToolbarProperties {
   final Map<String, String>? fontSizesValues;
 
   /// List of custom buttons
-  final List<QuillToolbarCustomButtonOptions> customButtons;
+  final List<QuillToolbarCustomButtonOptions> customButtonsFront;
+  final List<QuillToolbarCustomButtonOptions> customButtonsBack;
+
+  final bool isScrollable;
 
   final bool showDividers;
   final bool showFontFamily;

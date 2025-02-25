@@ -10,19 +10,19 @@ class QuillToolbarArrowIndicatedButtonList extends StatefulWidget {
   const QuillToolbarArrowIndicatedButtonList({
     required this.axis,
     required this.buttons,
+    required this.isScrollable,
     super.key,
   });
 
   final Axis axis;
   final List<Widget> buttons;
+  final bool isScrollable;
 
   @override
-  QuillToolbarArrowIndicatedButtonListState createState() =>
-      QuillToolbarArrowIndicatedButtonListState();
+  QuillToolbarArrowIndicatedButtonListState createState() => QuillToolbarArrowIndicatedButtonListState();
 }
 
-class QuillToolbarArrowIndicatedButtonListState
-    extends State<QuillToolbarArrowIndicatedButtonList>
+class QuillToolbarArrowIndicatedButtonListState extends State<QuillToolbarArrowIndicatedButtonList>
     with WidgetsBindingObserver {
   final ScrollController _controller = ScrollController();
   bool _showBackwardArrow = false;
@@ -74,10 +74,8 @@ class QuillToolbarArrowIndicatedButtonListState
     if (!mounted) return;
 
     setState(() {
-      _showBackwardArrow =
-          _controller.position.minScrollExtent != _controller.position.pixels;
-      _showForwardArrow =
-          _controller.position.maxScrollExtent != _controller.position.pixels;
+      _showBackwardArrow = _controller.position.minScrollExtent != _controller.position.pixels;
+      _showForwardArrow = _controller.position.maxScrollExtent != _controller.position.pixels;
     });
   }
 
@@ -112,7 +110,7 @@ class QuillToolbarArrowIndicatedButtonListState
         child: CustomScrollView(
           scrollDirection: widget.axis,
           controller: _controller,
-          physics: const ClampingScrollPhysics(),
+          physics: widget.isScrollable == true ? const ClampingScrollPhysics() : const NeverScrollableScrollPhysics(),
           slivers: [
             SliverFillRemaining(
               hasScrollBody: false,
